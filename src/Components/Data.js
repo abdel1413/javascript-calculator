@@ -1,7 +1,7 @@
 export const Data = [
   { key: "AC", value: "AC", id: "clear" },
   { key: "/", value: "/", id: "divide" },
-  { key: "x", value: "*", id: "multiply" },
+  { key: "x", value: "x", id: "multiply" },
   { key: "7", value: "7", id: "seven" },
   { key: "8", value: "8", id: "eight" },
   { key: "9", value: "9", id: "nine" },
@@ -17,3 +17,6 @@ export const Data = [
   { key: "0", value: "0", id: "zero" },
   { key: ".", value: ".", id: "decimal" },
 ];
+
+export const operands = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
+export const operators = ["AC", "x", "+", "-", "/", "="];

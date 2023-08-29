@@ -1,146 +1,263 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./App.css";
 import "@fontsource/russo-one";
-import { Data } from "./Components/Data";
+import { Data, operands, operators } from "./Components/Data";
 import { HistoryField } from "./Components/DisplayInputs/HistoryField";
 import { InputOutputField } from "./Components/DisplayInputs/InputOutputField";
 import { Keyboard } from "./Components/Keyboard";
-
+/* eslint-disable no-eval */
 function App() {
   const [data, setData] = useState(Data);
   const [value, setValue] = useState("");
   const [history, setHistory] = useState("");
+  const [output, setOutput] = useState("");
 
-  const handleClick = (e) => {
-    let eValue = e.target.value;
-    //setValue(value);
+  const handleOutput = () => {
+    setOutput(value);
+  };
+  useEffect(() => {
+    handleOutput();
+  }, [value]);
 
-    let v = value + eValue;
+  const handleClick = (value) => {
+    let operand = operands.find((num) => num === value);
 
-    if (v[0] === "0" && v[1] !== ".") {
-      v = value.slice(1);
-    }
-    setValue(v);
-    // let hist = history + eValue;
-    setHistory(history + eValue);
+    let operator = operators.find((op) => op === value);
 
-    if (eValue === "AC") {
-      setHistory("");
-      setValue("");
-      return;
-    }
-
-    for (let i = 0; i < value.length; i++) {
-      if (value[value.length - 1] === eValue) {
-        let v = value.substr(0, value.length - 1);
-        setValue(v + eValue);
-        setHistory(v + eValue);
-      } else {
-        let temp = Number(value[value.length - 1]);
-        let conv = Number(eValue);
-        /**
-       *  (temp === "-" ||
-            temp === "+" ||
-            temp === "*" ||
-            temp === "/" ||
-            temp === ".") &&
-          (eValue === "-" ||
-            eValue === "+" ||
-            eValue === "*" ||
-            eValue === "/" ||
-            eValue === ".")
-       */
-
-        if (isNaN(temp) && isNaN(conv)) {
-          let v = value.substr(0, value.length - 1);
-
-          setValue(v + eValue);
-          setHistory(v + eValue);
-        } else {
-          setValue(value + eValue);
-          setHistory(value + eValue);
-        }
-      }
-    }
-    //evaluate the inputs using switch statement
-    switch (eValue) {
+    setValue(value);
+    setHistory((v) => v + value);
+    switch (value) {
       case "=":
-        let solution = eval(value);
-        if (solution % 1 === 0) {
-          setValue(solution);
-          setHistory(`${value} ${eValue} ${solution}`);
-        } else {
-          setValue(solution.toFixed(2));
-          setHistory(`${value} ${eValue} ${solution.toFixed(2)}`);
-        }
+        handleEqual();
         break;
-      case "+":
-        setValue(eval(value) + eValue);
-        setHistory(`${eval(value)} ${eValue}`);
+      case "AC":
+        handlClear();
         break;
-      case "-":
-        setValue(`${eval(value)}${eValue}`);
-        setHistory(`${eval(value)} ${eValue}`);
+      case operand:
+        handleOperand(value);
         break;
-      case "*":
-        setValue(`${eval(value)}${eValue}`);
-        setHistory(`${eval(value)} ${eValue}`);
+      case operator:
+        handleOperator(value);
         break;
-      case "/":
-        setValue(`${eval(value)}${eValue}`);
-        setHistory(`${eval(value)} ${eValue}`);
+      case ".":
+        handleDot(value);
         break;
       default:
-        return;
+        break;
     }
 
-    // if (eValue === "=") {
-    //   let solution = eval(value);
-    //   if (solution % 1 === 0) {
-    //     setValue(solution);
-    //     setHistory(value + " " + eValue + " " + solution);
+    // let eValue = e.target.value;
+    // //setValue(value);
+
+    // let v = value + eValue;
+
+    // if (v[0] === "0" && v[1] !== ".") {
+    //   v = value.slice(1);
+    // } else {
+    //   setValue(v);
+    //   setHistory(history + eValue);
+    // }
+
+    // // if (!value.length) {
+    // //   setValue("0.");
+    // //   setHistory("0.");
+    // // }
+
+    // for (let i = 0; i < value.length; i++) {
+    //   let temp = Number(value[value.length - 1]);
+    //   let conv = Number(eValue);
+    //   if (eValue === "AC") {
+    //     setHistory("");
+    //     setValue("");
+    //     return;
+    //   } else if (eValue === ".") {
+    //     //
+    //     setValue(
+    //       value[value.length - 1] === "." || value.includes(".")
+    //         ? `${value}`
+    //         : `${value}.`
+    //     );
+    //     //
+    //   } else if (
+    //     value[value.length - 1] === eValue &&
+    //     isNaN(temp) &&
+    //     isNaN(conv)
+    //   ) {
+    //     let v = value.substr(0, value.length - 1);
+    //     setValue(eval(v) + eValue);
+    //     setHistory(eval(v) + eValue);
     //   } else {
-    //     setValue(solution.toFixed(2));
-    //     setHistory(value + " " + eValue + " " + solution.toFixed(2));
+    //     if (isNaN(temp) && isNaN(conv)) {
+    //       let v = value.substr(0, value.length - 1);
+    //       setValue(v + eValue);
+    //       setHistory(v + eValue);
+    //     } else {
+    //       setValue(value + eValue);
+    //       setHistory(value + eValue);
+    //     }
+    //   }
+
+    //   /**
+    //    *  (temp === "-" ||
+    //    temp === "+" ||
+    //    temp === "*" ||
+    //    temp === "/" ||
+    //    temp === ".") &&
+    //    (eValue === "-" ||
+    //    eValue === "+" ||
+    //    eValue === "*" ||
+    //    eValue === "/" ||
+    //    eValue === ".")
+    //    */
+
+    //   //evaluate the inputs using switch statement
+    //   switch (eValue) {
+    //     case "=":
+    //       let solution = eval(value);
+    //       if (solution % 1 === 0) {
+    //         setValue(`${solution}`);
+    //         setHistory(`${value} ${eValue} ${solution.toFixed(2)}`);
+
+    //         return;
+    //       } else {
+    //         setValue(solution.toFixed(2));
+    //         setHistory(`${value} ${eValue} ${solution.toFixed(2)}`);
+    //       }
+
+    //       break;
+
+    //     // case "+":
+    //     //   let sol = eval(value);
+    //     //   setValue(sol + eValue);
+    //     //   setHistory(`${sol}${eValue}`);
+    //     //   break;
+    //     // case "-":
+    //     //   setValue(`${eval(value)}${eValue}`);
+    //     //   setHistory(`${eval(value)}${eValue}`);
+    //     //   break;
+    //     // case "*":
+    //     //   setValue(`${eval(value)}${eValue}`);
+    //     //   setHistory(`${eval(value)} ${eValue}`);
+    //     //   break;
+    //     // case "/":
+    //     //   setValue(`${eval(value)}${eValue}`);
+    //     //   setHistory(`${eval(value)} ${eValue}`);
+    //     //   break;
+    //     default:
+    //       return;
     //   }
     // }
   };
 
-  // //covert the value to number
-  // const convertInputValue = (num) => {
-  //   let numValue = Number(num);
-  //   //let val = numValue.toLocaleString("en");
+  const handleOperand = (val) => {
+    if (!value.length) {
+      setValue(`${val}`);
+      setHistory(`${val}`);
+    } else {
+      //value exist and it has some chars.
+      //check if the value char intered is 0
+      if (val === "0" && (value === "0" || history === "0")) {
+        setValue(value);
+        setHistory(value);
+      } else {
+        //char is not zero so get the last char
+        let lastChar = value.charAt(value.length - 1);
 
-  //   // console.log("input", typeof numValue);
-  //   return numValue;
-  // };
+        let isLastChartOpe = lastChar === "x" || operators.includes(lastChar);
+        if (isLastChartOpe) {
+          setValue(`${val}`);
+        } else {
+          setValue(`${value}${val}`);
+        }
 
-  // let result = 0;
+        // setHistory(isLastChartOpe ? `${value}` : `${history}${val}`);
+      }
+    }
+  };
 
-  // const computeInputs = (inputvalues) => {
-  //   if (typeof inputvalues !== Number) {
-  //     // convertInputValue(inputvalues);
-  //     inputvalues = Number(inputvalues);
-  //     result = eval(inputvalues).toString();
-  //   }
+  const handleOperator = (val) => {
+    if (value.length) {
+      //setValue(`${value}`);
+      setHistory(`${val}`);
+      // }
 
-  //   return result;
-  // };
-  // console.log("comput ", computeInputs(value));
+      let bfLastChar = value.charAt(value.length - 2);
+      // console.log("bf", bfLastChar);
+      let lastChar = value.charAt(value.length - 1);
+      // console.log("last", lastChar);
 
-  // const resetHistory = (num) => {
-  //   if ((num = "AC")) {
-  //     setHistory("");
-  //   } else {
-  //     setHistory(history + num);
-  //   }
-  // };
+      let bfLastCharInOpe =
+        operators.includes(bfLastChar) || bfLastChar === "x";
+      let lastCharInOpe = operators.includes(lastChar) || lastChar === "x";
+
+      let overriedMultipleChar = val === "x" ? "*" : val;
+      // let overrid = "*";
+
+      if (
+        (lastCharInOpe && val !== "-") ||
+        (bfLastCharInOpe && lastCharInOpe)
+      ) {
+        if (bfLastCharInOpe) {
+          let updateValue = `${value.substr(0, value.length - 2)}${val}`;
+          setValue(updateValue);
+          //setHistory(updateValue);
+        } else {
+          ///
+
+          setValue(`${value.substr(0, value.length - 1)}${val}`);
+        }
+      } else {
+        setHistory(`${value}${val}`);
+      }
+    }
+  };
+
+  const handlClear = () => {
+    setValue("");
+    setHistory("");
+  };
+
+  const handleEqual = () => {
+    let n = history.replace("x", "*");
+    let result = eval(n);
+    setValue(`${result}`);
+    setHistory((v) => `${v}${result}`);
+  };
+
+  const handleDot = (val) => {
+    let lastChar = value.charAt(value.length - 1);
+
+    if (!value.length) {
+      setValue("0.");
+      setHistory("0.");
+    } else {
+      if (lastChar === "x" || operators.includes(lastChar)) {
+        //  setValue(value)
+        setValue(`${value}0.`);
+        setHistory(`${history}.`);
+      } else {
+        //avoid multiple dots in a segment/substring
+        let isDot =
+          lastChar === "." || value.includes(".")
+            ? `${value}`
+            : `${value}${val}`;
+
+        setValue(isDot);
+        //handled
+        let hist =
+          lastChar === val || value.includes(val)
+            ? `${history}`
+            : `${history}${val}`;
+        setHistory(`${hist}`);
+      }
+    }
+  };
 
   return (
     <div className="App">
       <div className="display-fields">
         <HistoryField history={history} />
-        <InputOutputField result={value} />
+        <InputOutputField input={value || output || 0} />
       </div>
       <div>
         <Keyboard handleClick={handleClick} data={data} />

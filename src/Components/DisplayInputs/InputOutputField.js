@@ -1,5 +1,5 @@
-export const InputOutputField = (props) => {
-  return <input id="display" value={props.result ? props.result : 0} />;
+export const InputOutputField = ({ input, output }) => {
+  return <input id="display" value={input ? input : 0} />;
 };
 
 // InputOutputField.defaultProps = { result: 0 };
