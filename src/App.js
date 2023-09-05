@@ -23,6 +23,13 @@ function App() {
   const handleClick = (value) => {
     let operand = operands.find((num) => num === value);
     let operator = operators.find((op) => op === value);
+
+    //make sure if = sign is clicked, to set override state to true;
+    // clear whatever we have in history and value then
+    //reset value to take new entered value passing by
+    //history and then return reset history
+    //note this is bcz of history is depending on value
+    //and vice-versa. hence we need to do it synchronisely
     if (overrideValue) {
       handlClear();
       setOverrideValue(false);
@@ -66,6 +73,8 @@ function App() {
       //value is not zero so get the last char
       let lastChar = value.charAt(value.length - 1);
 
+      // if the value you entered is operator, just set the  value with the
+      //it otherwise append it with the existing values
       let isLastChartOpe = lastChar === "*" || operators.includes(lastChar);
       if (isLastChartOpe) {
         setValue(`${val}`);
@@ -77,7 +86,7 @@ function App() {
 
   const handleOperator = (val) => {
     if (value.length) {
-      setHistory((v) => ` ${v} ${val}`);
+      setHistory(`${val}`);
 
       let bfLastChar = history.charAt(history.length - 2);
 
@@ -90,6 +99,12 @@ function App() {
 
       let overriedMultipleChar = val === "x" ? "*" : val;
 
+      //check if the last car is operator and it's not -, and
+      //also its previous char is operation, then override the
+      // both chars with the current operation. but if only the
+      //last char is operation then override it with
+      //the current value
+      //otherwise just append the char to the end.
       if (
         (lastCharInOpe && val !== "-") ||
         (bfLastCharInOpe && lastCharInOpe)
@@ -129,9 +144,9 @@ function App() {
         setValue(history.substr(0, history.length - 1));
       } else {
         let result = eval(n);
-        setOverrideValue(true);
-        setHistory(` ${result}`);
-        setValue(` ${result}`);
+        // setOverrideValue(true);
+        setHistory(`${result}`);
+        setValue(`${result}`);
       }
     }
   };
@@ -143,6 +158,7 @@ function App() {
       setValue("0.");
       setHistory("0.");
     } else {
+      //allow 0 after we enter a digit followed by dot (.)
       if (lastChar === "x" || operators.includes(lastChar)) {
         setValue(`${value}0.`);
         setHistory(`${history}0.`);
@@ -154,7 +170,7 @@ function App() {
             : `${value}${val}`;
 
         setValue(isDot);
-        //handled
+        //don't append dot (.) to history if it contains one already
         let hist =
           lastChar === val || value.includes(val)
             ? `${history}`
