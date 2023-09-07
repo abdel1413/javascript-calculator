@@ -97,6 +97,7 @@ function App() {
 
       let lastCharInOpe = operators.includes(lastChar) || lastChar === "*";
 
+      //override the x to *
       let overriedMultipleChar = val === "x" ? "*" : val;
 
       //check if the last car is operator and it's not -, and
